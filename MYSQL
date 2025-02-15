@@ -1,0 +1,90 @@
+Step 1: Create Table
+CREATE TABLE ev_charging_stations (
+    Station_ID INT PRIMARY KEY,
+    Address VARCHAR(255),
+    City VARCHAR(100),
+    State VARCHAR(50),
+    Country VARCHAR(50),
+    Zip_Code VARCHAR(20),
+    Latitude DECIMAL(9,6),
+    Longitude DECIMAL(9,6),
+    Charger_Type VARCHAR(50),
+    Charging_Capacity_kW DECIMAL(5,2),
+    Cost_USD_kWh DECIMAL(5,2),
+    Usage_Stats INT,  -- Average daily users
+    Station_Operator VARCHAR(100),
+    Distance_to_City_km DECIMAL(5,2),
+    Renewable_Energy_Source VARCHAR(50), 
+    Maintenance_Frequency INT, 
+    Last_Maintenance_Date DATE
+);
+
+Step 2: Insert Sample Data
+INSERT INTO ev_charging_stations 
+(Station_ID, Address, City, State, Country, Zip_Code, Latitude, Longitude, Charger_Type, Charging_Capacity_kW, Cost_USD_kWh, Usage_Stats, Station_Operator, Distance_to_City_km, Renewable_Energy_Source, Maintenance_Frequency, Last_Maintenance_Date) 
+VALUES
+(1, '123 Main St', 'New York', 'NY', 'USA', '10001', 40.712776, -74.005974, 'DC Fast', 150, 0.20, 120, 'Tesla', 2.5, 'Yes', 3, '2024-01-10'),
+(2, '456 Elm St', 'Los Angeles', 'CA', 'USA', '90001', 34.052235, -118.243683, 'Level 2', 50, 0.15, 80, 'ChargePoint', 4.0, 'No', 5, '2024-02-15'),
+(3, '789 Pine St', 'Chicago', 'IL', 'USA', '60601', 41.878113, -87.629799, 'Level 1', 10, 0.10, 30, 'EVgo', 8.0, 'Yes', 2, '2023-12-20'),
+(4, '321 Maple Ave', 'San Francisco', 'CA', 'USA', '94101', 37.774929, -122.419418, 'DC Fast', 120, 0.22, 150, 'Tesla', 3.0, 'Yes', 4, '2024-01-05');
+
+1. Top 10 Most Used Charging Stations
+SELECT Station_ID, Address, City, State, Charger_Type, Usage_Stats, Station_Operator 
+FROM ev_charging_stations 
+ORDER BY Usage_Stats DESC 
+LIMIT 10;
+
+2. Charger Type Usage Trends
+Average Usage per Charger Type
+SELECT Charger_Type, AVG(Usage_Stats) AS Avg_Usage 
+FROM ev_charging_stations 
+GROUP BY Charger_Type 
+ORDER BY Avg_Usage DESC;
+
+Number of Stations by Charger Type
+SELECT Charger_Type, COUNT(*) AS Station_Count 
+FROM ev_charging_stations 
+GROUP BY Charger_Type 
+ORDER BY Station_Count DESC;
+
+3. Impact of Cost on Usage
+🔹 Find the Average Usage for Each Price Bracket
+SELECT Cost_USD_kWh, AVG(Usage_Stats) AS Avg_Usage 
+FROM ev_charging_stations 
+GROUP BY Cost_USD_kWh 
+ORDER BY Cost_USD_kWh;
+
+🔹 Most Expensive vs. Cheapest Charging Stations
+SELECT Station_ID, Address, Cost_USD_kWh, Usage_Stats 
+FROM ev_charging_stations 
+ORDER BY Cost_USD_kWh DESC 
+LIMIT 5;
+
+4. Geospatial Analysis (City Distance)
+🔹 High-Demand Stations Near City Centers
+SELECT Address, City, Distance_to_City_km, Usage_Stats 
+FROM ev_charging_stations 
+WHERE Distance_to_City_km < 5 
+ORDER BY Usage_Stats DESC 
+LIMIT 10;
+
+🔹 Low-Demand Stations in Remote Areas
+SELECT Address, City, Distance_to_City_km, Usage_Stats 
+FROM ev_charging_stations 
+WHERE Distance_to_City_km > 50 
+ORDER BY Usage_Stats ASC 
+LIMIT 10;
+ 
+5.Renewable Energy Impact
+🔹 Compare Usage of Stations with and Without Renewable Energy
+SELECT Renewable_Energy_Source, AVG(Usage_Stats) AS Avg_Usage 
+FROM ev_charging_stations 
+GROUP BY Renewable_Energy_Source 
+ORDER BY Avg_Usage DESC;
+
+ 6. Maintenance Insights
+🔹 Stations with Frequent Maintenance Issues
+SELECT Station_ID, Address, Maintenance_Frequency, Usage_Stats 
+FROM ev_charging_stations 
+ORDER BY Maintenance_Frequency DESC 
+LIMIT 10;
